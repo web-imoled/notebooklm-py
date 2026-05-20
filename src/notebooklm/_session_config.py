@@ -1,8 +1,8 @@
 """Module-level constants for the NotebookLM session client.
 
-Holds the ``DEFAULT_*`` knobs that historically lived in :mod:`notebooklm._core`'s
-preamble. Each constant is re-exported from :mod:`notebooklm._core` so existing
-``from notebooklm._core import DEFAULT_TIMEOUT`` imports keep working.
+Holds the ``DEFAULT_*`` knobs that historically lived in :mod:`notebooklm._session`'s
+preamble. Each constant is re-exported from :mod:`notebooklm._session` so existing
+``from notebooklm._session import DEFAULT_TIMEOUT`` imports keep working.
 
 These values are tuned for typical interactive workloads; see each docstring
 below for guidance on when an operator would want to override them via the

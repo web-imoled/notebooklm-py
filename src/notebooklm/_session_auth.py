@@ -37,7 +37,7 @@ tests/integration/concurrency/test_refresh_cancellation_propagation.py):
 * The ``_refresh_task`` slot is intentionally NOT cleared when a waiter is
   cancelled mid-shield — concurrency tests assert task identity across
   cancellation so siblings joined to the same single-flight refresh see the
-  same completion. Per ``_core.py`` history at the relocated comment site.
+  same completion. Per ``_session.py`` history at the relocated comment site.
 """
 
 from __future__ import annotations

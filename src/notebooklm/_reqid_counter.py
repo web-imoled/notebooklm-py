@@ -3,8 +3,8 @@
 Owns the monotonic ``_reqid`` value that Google's chat backend requires per
 request, plus the lazily-allocated ``asyncio.Lock`` that serialises the
 read-modify-write under concurrent ``ChatAPI.ask`` callers. Lifted out of
-``_core.py`` so the reqid surface has one home (this file) instead of being
-woven into ``Session.__init__`` alongside metrics, drain, and auth state.
+``_session.py`` so the reqid surface has one home (this file) instead of
+being woven into ``Session.__init__`` alongside metrics, drain, and auth state.
 
 Design constraints (load-bearing — see ``tests/unit/test_reqid_counter.py`` and
 ``tests/unit/test_reqid_counter_concurrent.py``):
@@ -47,7 +47,7 @@ from ._loop_affinity import assert_bound_loop
 DEFAULT_BASELINE: int = 100000
 # Default step applied by :meth:`ReqidCounter.next_reqid`. Matches the
 # historical bump that ``ChatAPI.ask`` performed under the legacy
-# ``self._core._reqid_counter += 100000`` contract.
+# ``self._session._reqid_counter += 100000`` contract.
 DEFAULT_STEP: int = 100000
 
 

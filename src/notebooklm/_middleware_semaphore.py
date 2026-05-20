@@ -68,7 +68,7 @@ class SemaphoreMiddleware:
     - ``semaphore_factory``: zero-arg callable returning an async context
       manager. Called once per chain invocation; the returned context manager
       is entered around ``next_call``. Production wires
-      ``lambda: client_core._get_rpc_semaphore()`` so the live (lazily
+      ``lambda: session._get_rpc_semaphore()`` so the live (lazily
       constructed, loop-bound) semaphore is observed on each call. Tests can
       pass ``lambda: contextlib.nullcontext()`` to disable gating.
 

@@ -336,7 +336,7 @@ class ArtifactDownloadService:
     ) -> str:
         """Download a mind map as JSON."""
         api = self._api
-        mind_maps = await _artifact_seams()._mind_map.list_mind_maps(api._core, notebook_id)
+        mind_maps = await _artifact_seams()._mind_map.list_mind_maps(api._session, notebook_id)
         if not mind_maps:
             raise ArtifactNotReadyError("mind_map")
 

@@ -95,9 +95,9 @@ def _status_error(code: int, *, retry_after: str | None = None) -> httpx.HTTPSta
     return httpx.HTTPStatusError(f"HTTP {code}", request=request, response=response)
 
 
-def test_core_reexports_transport_private_names():
+def test_session_reexports_transport_private_names():
     """Private imports from ``notebooklm._session`` remain source compatible."""
-    from notebooklm import _authed_transport, _core
+    from notebooklm import _authed_transport, _session
 
     moved_names = [
         "_AuthSnapshot",
@@ -108,12 +108,12 @@ def test_core_reexports_transport_private_names():
         "_parse_retry_after",
     ]
     for name in moved_names:
-        assert getattr(_core, name) is getattr(_authed_transport, name)
-    assert _core.MAX_RETRY_AFTER_SECONDS == _authed_transport.MAX_RETRY_AFTER_SECONDS
+        assert getattr(_session, name) is getattr(_authed_transport, name)
+    assert _session.MAX_RETRY_AFTER_SECONDS == _authed_transport.MAX_RETRY_AFTER_SECONDS
 
 
-def test_authed_transport_has_no_runtime_core_imports():
-    """The collaborator must not create a runtime import cycle back to _core."""
+def test_authed_transport_has_no_runtime_session_imports():
+    """The collaborator must not create a runtime import cycle back to _session."""
     path = Path(__file__).parents[2] / "src/notebooklm/_authed_transport.py"
     tree = ast.parse(path.read_text())
     parents: dict[ast.AST, ast.AST] = {}
@@ -136,16 +136,15 @@ def test_authed_transport_has_no_runtime_core_imports():
             continue
         if isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name == "notebooklm._session" or alias.name.endswith("._core"):
+                if alias.name == "notebooklm._session":
                     forbidden.append((node.lineno, f"import {alias.name}"))
         elif isinstance(node, ast.ImportFrom):
             module = node.module or ""
             names = {alias.name for alias in node.names}
             if (
                 module == "notebooklm._session"
-                or (module == "notebooklm" and "_core" in names)
-                or (node.level > 0 and module == "_core")
-                or (node.level > 0 and not module and "_core" in names)
+                or (module == "notebooklm" and "_session" in names)
+                or (node.level > 0 and not module and "_session" in names)
             ):
                 imported = ", ".join(sorted(names))
                 forbidden.append(

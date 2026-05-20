@@ -38,11 +38,7 @@ from ._cookie_persistence import CookiePersistence
 
 # Synthetic-error helpers — re-exported so ``tests/conftest.py``,
 # ``tests/unit/test_vcr_config.py``, and any other test that imports
-# them through ``notebooklm._core`` keep resolving them as documented.
-# The pre-Tier-12 ``_SyntheticErrorTransport`` httpx transport was
-# deleted in PR 12.9 (substitution moved into
-# ``ErrorInjectionMiddleware`` in PR 12.6); only the env-var resolver
-# and the startup guard remain.
+# them through ``notebooklm._session`` keep resolving them as documented.
 from ._error_injection import (
     ERROR_INJECT_ENV_VAR as ERROR_INJECT_ENV_VAR,
 )
@@ -74,13 +70,11 @@ from ._reqid_counter import ReqidCounter
 from ._rpc_executor import RpcExecutor
 from ._session_auth import AuthRefreshCoordinator
 
-# Re-exports for the public-on-private import contract. ``_core.py``'s preamble
-# historically held the ``DEFAULT_*`` constants, the auth-error helpers, and the
-# test-only synthetic-error transport plumbing inline. They now live in
-# dedicated seam modules; the imports below preserve the
-# ``from notebooklm._core import …`` surface that tests and first-party callers
-# rely on. Each ``as`` alias keeps ruff's ``unused-import`` lint satisfied while
-# making the re-export intent explicit at the source.
+# Re-exports for the public-on-private import contract. The ``DEFAULT_*``
+# constants and auth-error helpers live in dedicated seam modules; the imports
+# below preserve the ``from notebooklm._session import …`` surface that tests
+# and first-party callers rely on. Each ``as`` alias keeps ruff's
+# ``unused-import`` lint satisfied while making the re-export intent explicit.
 from ._session_config import (
     DEFAULT_CONNECT_TIMEOUT as DEFAULT_CONNECT_TIMEOUT,
 )
@@ -100,8 +94,8 @@ from ._session_config import (
     normalize_max_concurrent_uploads,
 )
 
-# Cross-seam helpers — re-exported so ``from notebooklm._core import
-# is_auth_error`` keeps working for sub-clients and tests.
+# Cross-seam helpers — re-exported so ``from notebooklm._session import
+# is_auth_error`` works for sub-clients and tests.
 from ._session_helpers import (
     AUTH_ERROR_PATTERNS as AUTH_ERROR_PATTERNS,
 )
@@ -114,24 +108,15 @@ from ._session_helpers import (
 from ._session_lifecycle import ClientLifecycle
 from ._transport_drain import TransportDrainTracker
 
-# Re-exported so the existing import path ``from notebooklm._core import
-# _TransportOperationToken`` keeps working after the dataclass moved into
-# ``_transport_drain``. ``_transport_drain`` is the source of truth for the token
-# shape; the alias below is the backwards-compat anchor.
+# ``_TransportOperationToken`` re-exported from ``_transport_drain`` (source of
+# truth for the token shape); preserves the legacy import path.
 from ._transport_drain import _TransportOperationToken as _TransportOperationToken
 
-# ``save_cookies_to_storage`` is re-exported as ``notebooklm._core.save_cookies_to_storage``
-# so existing ``monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", …)``
-# sites in tests keep working (used in 8+ test files). The lifecycle helper
-# (``_session_lifecycle.ClientLifecycle.save_cookies``) reads the attribute via
-# ``from . import _core; _core.save_cookies_to_storage`` at call time so the
-# monkeypatched value is what runs on the live save path.
-#
-# ``_rotate_cookies`` is re-exported on the same module-level attribute surface
-# so ``tests/unit/concurrency/test_close_cancellation_leak.py:138``'s
-# ``monkeypatch.setattr("notebooklm._core._rotate_cookies", …)`` keeps
-# affecting the live keepalive loop (the lifecycle helper resolves it via
-# ``from . import _core; _core._rotate_cookies`` at call time).
+# ``save_cookies_to_storage`` and ``_rotate_cookies`` are re-exported here as
+# module-level attributes so ``monkeypatch.setattr("notebooklm._session.X", …)``
+# in tests reaches the live save / keepalive paths. ``_session_lifecycle``
+# resolves both via ``from . import _session as _session_module`` at call time
+# so the monkeypatched value is what runs.
 from .auth import (
     AuthTokens,
     CookieSnapshot,
@@ -329,7 +314,7 @@ class Session:
         # guard is a no-op for the normal production path (env var unset)
         # and for legitimate pytest contexts (PYTEST_CURRENT_TEST set).
         _refuse_synthetic_error_outside_test_context()
-        # Lazy import to break the types.py -> _core.py cycle.
+        # Lazy import to break the types.py -> _session.py cycle.
         from .types import ConnectionLimits
 
         self.auth = auth
@@ -347,7 +332,7 @@ class Session:
         _resolved_limits = limits if limits is not None else ConnectionLimits()
         # ``_refresh_retry_delay`` stays here directly — it is read on the
         # RPC retry path by ``RpcExecutor`` and ``AuthedTransport`` and SET
-        # by integration tests against ``client._core``. The refresh
+        # by integration tests against ``client._session``. The refresh
         # callback + the four refresh/auth-snapshot ivars (``_refresh_lock``,
         # ``_refresh_task``, ``_refresh_callback``, ``_auth_snapshot_lock``)
         # live on ``self._auth_coord``, constructed below alongside the other
@@ -431,7 +416,7 @@ class Session:
         # ``self._kernel``. Compat properties further down preserve the legacy
         # ivar names. The ``_resolve_keepalive_interval`` clamp now lives in
         # :mod:`notebooklm._session_helpers` and is re-exported above so
-        # ``from notebooklm._core import _resolve_keepalive_interval`` keeps
+        # ``from notebooklm._session import _resolve_keepalive_interval`` keeps
         # resolving; we call it through the re-exported binding here.
         #
         # Event-loop affinity guard rationale: the lifecycle captures
@@ -546,7 +531,7 @@ class Session:
                 refresh_callable=self._await_refresh,
                 # ``_live_is_auth_error`` re-reads ``is_auth_error`` from
                 # this module's globals on every call so test monkeypatches
-                # of ``notebooklm._core.is_auth_error`` reach the chain;
+                # of ``notebooklm._session.is_auth_error`` reach the chain;
                 # see that helper's docstring for the rationale.
                 is_auth_error=_live_is_auth_error,
                 refresh_callback_enabled=lambda: self._auth_coord.has_refresh_callback,
@@ -750,7 +735,7 @@ class Session:
             return
         with _OBSERVABILITY_INIT_LOCK:
             if not hasattr(self, "_lifecycle"):
-                # Lazy import to break the types.py -> _core.py cycle.
+                # Lazy import to break the types.py -> _session.py cycle.
                 from .types import ConnectionLimits
 
                 self._kernel = Kernel(async_client_factory=httpx.AsyncClient)
@@ -1160,14 +1145,16 @@ class Session:
 
         The adapters intentionally resolve through this module at call time so
         existing tests and private callers that monkeypatch
-        ``notebooklm._core.is_auth_error`` or ``notebooklm._core.asyncio.sleep``
-        still affect live transport behavior after the collaborator has been
-        constructed. Backoff jitter routes through ``notebooklm._backoff``,
-        which in turn calls ``random.uniform`` on the shared module.
+        ``notebooklm._session.is_auth_error`` or
+        ``notebooklm._session.asyncio.sleep`` still affect live transport
+        behavior after the collaborator has been constructed. Backoff jitter
+        routes through ``notebooklm._backoff``, which in turn calls
+        ``random.uniform`` on the shared module.
         ``tests/unit/test_authed_transport.py`` relies on monkeypatching
-        ``notebooklm._core.random.uniform`` to reach that jitter path; keep the
-        otherwise-unused module import so the path stays available. Attribute
-        patches on the singleton ``random`` module are visible to all importers.
+        ``notebooklm._session.random.uniform`` to reach that jitter path; keep
+        the otherwise-unused module import so the path stays available.
+        Attribute patches on the singleton ``random`` module are visible to all
+        importers.
         """
         transport = getattr(self, "_authed_transport", None)
         if transport is None:
@@ -1179,9 +1166,9 @@ class Session:
         """Return the RPC execution collaborator, lazily initialized.
 
         The adapters resolve through this module at call time so existing
-        monkeypatches of ``notebooklm._core.decode_response``,
-        ``notebooklm._core.is_auth_error``, and
-        ``notebooklm._core.asyncio.sleep`` keep affecting live RPC behavior
+        monkeypatches of ``notebooklm._session.decode_response``,
+        ``notebooklm._session.is_auth_error``, and
+        ``notebooklm._session.asyncio.sleep`` keep affecting live RPC behavior
         after the collaborator has been constructed.
         """
         executor = getattr(self, "_rpc_executor", None)
@@ -1220,7 +1207,7 @@ class Session:
         Thin facade over :meth:`ClientLifecycle.save_cookies`. The storage
         writer ``save_cookies_to_storage`` is resolved from this module at
         call time inside the lifecycle helper so existing
-        ``monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", …)``
+        ``monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", …)``
         sites continue to affect the live save path.
         """
         self._ensure_lifecycle()
@@ -1427,7 +1414,7 @@ class Session:
 
         Compatibility surface preserved so ``RpcExecutor.execute``
         (``_rpc_executor.py:275``), ``_chat_transport`` (``_chat_transport.py:64``),
-        and direct callers (``client._core._perform_authed_post(...)``) keep
+        and direct callers (``client._session._perform_authed_post(...)``) keep
         the same keyword-only signature. The body now builds an
         :class:`RpcRequest` with the three keyword-only args stashed into
         ``context`` and dispatches into :attr:`_authed_post_chain`.

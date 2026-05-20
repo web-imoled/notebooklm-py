@@ -512,7 +512,7 @@ class ArtifactGenerationService:
             [[[slide_index, prompt]]],
         ]
         try:
-            result = await api._core.rpc_call(
+            result = await api._session.rpc_call(
                 RPCMethod.REVISE_SLIDE,
                 params,
                 source_path=f"/notebook/{notebook_id}",
@@ -608,7 +608,7 @@ class ArtifactGenerationService:
         # explicitly to document this call site as the no-variant default
         # (the registry resolves the same entry either way; the explicit
         # kwarg is a future-proofing marker for a possible variant table).
-        result = await api._core.rpc_call(
+        result = await api._session.rpc_call(
             RPCMethod.GENERATE_MIND_MAP,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -636,7 +636,7 @@ class ArtifactGenerationService:
                     title = mind_map_data["name"]
 
                 note = await _artifact_seams()._mind_map.create_note(
-                    api._core,
+                    api._session,
                     notebook_id,
                     title=title,
                     content=mind_map_json,
@@ -658,7 +658,7 @@ class ArtifactGenerationService:
         api = self._api
         params = [[2], notebook_id]
 
-        result = await api._core.rpc_call(
+        result = await api._session.rpc_call(
             RPCMethod.GET_SUGGESTED_REPORTS,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -693,7 +693,7 @@ class ArtifactGenerationService:
             # no-variant default (the registry resolves the same entry
             # either way; the explicit kwarg is a future-proofing marker
             # for a possible variant table).
-            result = await api._core.rpc_call(
+            result = await api._session.rpc_call(
                 RPCMethod.CREATE_ARTIFACT,
                 params,
                 source_path=f"/notebook/{notebook_id}",

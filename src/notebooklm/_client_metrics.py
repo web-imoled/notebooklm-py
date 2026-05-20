@@ -2,7 +2,7 @@
 
 Owns the cumulative ``ClientMetricsSnapshot`` counters, the threading lock that
 guards them, and the optional ``on_rpc_event`` telemetry callback. Lifted out of
-``_core.py`` so the metrics surface has one home (this file) instead of being
+``_session.py`` so the metrics surface has one home (this file) instead of being
 woven into ``Session.__init__`` alongside drain, reqid, and auth state.
 
 Design constraints (load-bearing — see ``tests/unit/test_swallow_observability.py``

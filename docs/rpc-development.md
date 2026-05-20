@@ -290,7 +290,7 @@ async def new_method(self, notebook_id: str, param: str) -> SomeResult:
         [2],             # Position 2: Fixed flag
     ]
 
-    result = await self._core.rpc_call(
+    result = await self._session.rpc_call(
         RPCMethod.NEW_METHOD,
         params,
         source_path=f"/notebook/{notebook_id}",
@@ -392,10 +392,10 @@ Some methods require `source_path` for routing:
 
 ```python
 # May fail without source_path
-await self._core.rpc_call(RPCMethod.X, params)
+await self._session.rpc_call(RPCMethod.X, params)
 
 # Correct
-await self._core.rpc_call(
+await self._session.rpc_call(
     RPCMethod.X,
     params,
     source_path=f"/notebook/{notebook_id}",
@@ -407,7 +407,7 @@ await self._core.rpc_call(
 API returns nested arrays. Print raw response first:
 
 ```python
-result = await self._core.rpc_call(...)
+result = await self._session.rpc_call(...)
 print(f"DEBUG: {result}")  # See actual structure
 ```
 

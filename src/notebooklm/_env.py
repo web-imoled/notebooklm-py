@@ -107,7 +107,7 @@ def get_default_language() -> str:
     This value is threaded into two places:
 
     * The ``hl`` URL query parameter on every batchexecute RPC call
-      (``_core._build_url`` and ``_chat.ask``).
+      (``_session._build_url`` and ``_chat.ask``).
     * The default ``language`` argument of the language-aware
       ``ArtifactsAPI.generate_*`` methods, which embed the code into the
       RPC payload.

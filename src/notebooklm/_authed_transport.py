@@ -41,8 +41,9 @@ MAX_RETRY_AFTER_SECONDS = 300
 # this with a running size guard so a runaway or hostile server can't exhaust
 # process memory by emitting a huge body. 50 MiB is far above any legitimate
 # batchexecute response we've observed and well below the OOM threshold on a
-# typical workstation. Kept in this module (not ``_core.py``) so the streaming
-# read loop can read it without creating an import cycle through ``_core``.
+# typical workstation. Kept in this module (not ``_session.py``) so the
+# streaming read loop can read it without creating an import cycle through
+# ``_session``.
 MAX_RPC_RESPONSE_BYTES = 50 * 1024 * 1024
 
 # Headers that must NOT survive onto a Response rebuilt from already-decoded

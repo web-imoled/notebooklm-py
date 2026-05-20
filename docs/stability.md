@@ -134,7 +134,7 @@ UnknownTypeWarning        # Warning category emitted when .kind falls back to UN
 ```python
 # These are NOT part of the public API:
 notebooklm.rpc.*          # RPC protocol internals, except the documented RPCMethod import path for NotebookLMClient.rpc_call()
-notebooklm._core.*        # Core infrastructure
+notebooklm._session.*     # Session orchestration
 notebooklm._*.py          # All underscore-prefixed modules
 notebooklm.auth.*         # Auth internals (except documented AuthTokens, cookie conversion, and cookie-domain constants)
 ```

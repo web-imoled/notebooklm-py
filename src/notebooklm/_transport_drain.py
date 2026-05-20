@@ -2,7 +2,7 @@
 
 Owns the in-flight transport-operation counters, the lazy
 ``asyncio.Condition`` that ``drain()`` parks on, the per-``asyncio.Task``
-operation-depth map, and the ``_draining`` flag. Lifted out of ``_core.py``
+operation-depth map, and the ``_draining`` flag. Lifted out of ``_session.py``
 so the drain surface has one home (this file) instead of being woven into
 ``Session.__init__`` alongside metrics, reqid, and auth state.
 
@@ -62,7 +62,7 @@ class _TransportOperationToken:
     is the ``asyncio.Task`` whose operation depth was bumped on admission
     (or ``None`` for the unusual case of a begin issued outside any task).
 
-    Re-exported from ``notebooklm._core`` for backwards compatibility —
+    Re-exported from ``notebooklm._session`` for backwards compatibility —
     keep this dataclass frozen so token equality is by value.
     """
 

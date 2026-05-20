@@ -1,5 +1,12 @@
 # Migration: Tier 12 → Tier 13
 
+> **Update:** the `notebooklm._core` compatibility shim referenced throughout
+> this document has been **removed**. All symbols documented as
+> "re-exported via `_core`" below now resolve only via their final home
+> module (or via `notebooklm._session` for the symbols originally re-exported
+> through the `_session` preamble). The `notebooklm._core` logger name
+> (`CORE_LOGGER_NAME`) is preserved as an external telemetry contract.
+
 Tier 12 ("middleware chain") and Tier 13 ("Session/Kernel split") restructured
 the **private** core layer of `notebooklm-py`. The **public** API
 (`NotebookLMClient`, `AuthTokens`, the dataclasses re-exported from
@@ -20,11 +27,9 @@ anything.
 
 ## Quick guidance
 
-- **Stop importing from `notebooklm._core`** for new code. The module is now a
-  compatibility shim that re-exports the concrete `Session` orchestrator from
-  `notebooklm._session`. Existing imports still resolve, but the symbols
-  documented below live on their final home modules now and the shim may be
-  removed in a later refactor.
+- **Do not import from `notebooklm._core`** — the shim has been removed.
+  Import from `notebooklm._session` (the concrete `Session` orchestrator) or
+  directly from the home modules listed below.
 - **Prefer the public surface** — `notebooklm.NotebookLMClient`,
   `notebooklm.AuthTokens`, `notebooklm.rpc.RPCMethod`, and the types/exceptions
   re-exported from the top-level package.

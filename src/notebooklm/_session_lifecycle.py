@@ -14,7 +14,7 @@ Owns the session-side open/close ordering that historically lived inline on
 * ``_keepalive_interval`` / ``_keepalive_storage_path`` — keepalive
   configuration; the interval is clamped against ``keepalive_min_interval``
   via :func:`notebooklm._session_helpers._resolve_keepalive_interval` (re-exported
-  from :mod:`notebooklm._core` so the legacy import path keeps resolving).
+  from :mod:`notebooklm._session` so the legacy import path keeps resolving).
 * ``_timeout`` / ``_connect_timeout`` / ``_limits`` — HTTP timeouts and
   connection-pool tuning consumed in :meth:`open`.
 
@@ -47,8 +47,8 @@ Design constraints (load-bearing — see ``tests/unit/test_client_keepalive.py``
   transport stays a real, unwrapped transport at all times.
 
 * :meth:`save_cookies` resolves ``save_cookies_to_storage`` from
-  ``notebooklm._core`` at call time so the
-  ``monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", …)``
+  ``notebooklm._session`` at call time so the
+  ``monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", …)``
   surface used by 8+ test files keeps affecting the live save path.
 
 * ``_bound_loop`` is bound exactly once per :meth:`open` call; :meth:`close`
@@ -151,7 +151,7 @@ class ClientLifecycle:
         # types.py import cycle.
         self._limits: ConnectionLimits = limits
         # Pre-clamped by :func:`notebooklm._session_helpers._resolve_keepalive_interval`
-        # (re-exported as ``notebooklm._core._resolve_keepalive_interval``) at
+        # (re-exported as ``notebooklm._session._resolve_keepalive_interval``) at
         # the ``Session`` boundary so the floor-vs-user-value branching
         # stays in one place — the seam helper.
         self._keepalive_interval: float | None = keepalive_interval

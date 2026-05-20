@@ -22,7 +22,6 @@ src/notebooklm/
 ├── auth.py              # Authentication handling
 ├── types.py             # Dataclasses and type definitions
 ├── _session.py          # Concrete Session HTTP/RPC infrastructure
-├── _core.py             # Legacy compatibility shim
 ├── _notebooks.py        # NotebooksAPI implementation
 ├── _notebook_metadata.py # Private notebook metadata composition service
 ├── _sources.py          # SourcesAPI implementation
@@ -85,20 +84,19 @@ src/notebooklm/
 |-------|-------|----------------|
 | **CLI** | `cli/*.py` | User commands, input validation, Rich output |
 | **Client** | `client.py`, `_*.py` | High-level Python API, returns typed dataclasses |
-| **Session** | `_session.py`, `_core.py`, `_kernel.py`, session/kernel collaborators | `Session` orchestrator + seam-module helpers (HTTP client lifecycle, RPC dispatch, metrics, drain bookkeeping, request-id counter, auth refresh, conversation cache, polling registry, cookie persistence) |
+| **Session** | `_session.py`, `_kernel.py`, session/kernel collaborators | `Session` orchestrator + seam-module helpers (HTTP client lifecycle, RPC dispatch, metrics, drain bookkeeping, request-id counter, auth refresh, conversation cache, polling registry, cookie persistence) |
 | **RPC** | `rpc/*.py` | Protocol encoding/decoding, method IDs |
 
 #### Session-layer seam modules
 
-The `Session` layer is split across `_session.py` (orchestrator), `_core.py`
-(legacy compatibility shim), `_kernel.py` (HTTP client owner), and
-single-responsibility collaborator modules. Each helper exposes a
-Protocol-shim host interface so it can be unit-tested against a stub `Session`:
+The `Session` layer is split across `_session.py` (orchestrator),
+`_kernel.py` (HTTP client owner), and single-responsibility collaborator
+modules. Each helper exposes a Protocol-shim host interface so it can be
+unit-tested against a stub `Session`:
 
 | Module | Class | Responsibility |
 |---|---|---|
 | `_session.py` | `Session` | Orchestrator owning the `httpx.AsyncClient` + `AuthTokens`; module-level constants and re-exports; error-injection seam (`_get_error_injection_mode`) used by middleware-level error injection. |
-| `_core.py` | shim | Compatibility re-export surface for legacy private imports. |
 | `_client_metrics.py` | `ClientMetrics` | `ClientMetricsSnapshot` counters, queue-wait recorders, `on_rpc_event` async callback. |
 | `_transport_drain.py` | `TransportDrainTracker` | In-flight transport counters, `_TransportOperationToken`, lazy `asyncio.Condition` powering `client.drain(...)`. |
 | `_reqid_counter.py` | `ReqidCounter` | Monotonic `_reqid` counter for chat backend (baseline 100000, step 100000). |
@@ -171,7 +169,7 @@ The architecture tests encode the current layer contract:
 
 **New API Class:**
 1. Create `_newfeature.py` with `NewFeatureAPI` class
-2. Add to `client.py`: `self.newfeature = NewFeatureAPI(self._core)`
+2. Add to `client.py`: `self.newfeature = NewFeatureAPI(self._session)`
 3. Export types from `__init__.py`
 
 ---
