@@ -167,7 +167,8 @@ class ArtifactsAPI:
                 compatibility with tests that construct ``ArtifactsAPI(core)``.
             drain_hooks: Close-time hook registration surface.
         """
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
         if notebooks is None:
             from ._notebooks import NotebooksAPI
 
@@ -518,7 +519,7 @@ class ArtifactsAPI:
 
     async def _get_artifact_content(self, notebook_id: str, artifact_id: str) -> str | None:
         """Fetch artifact HTML content for quiz/flashcard types."""
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.GET_INTERACTIVE_HTML,
             [artifact_id],
             source_path=f"/notebook/{notebook_id}",
@@ -633,7 +634,7 @@ class ArtifactsAPI:
         """
         logger.debug("Deleting artifact %s from notebook %s", artifact_id, notebook_id)
         params = [[2], artifact_id]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.DELETE_ARTIFACT,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -650,7 +651,7 @@ class ArtifactsAPI:
             new_title: The new title.
         """
         params = [[artifact_id, new_title], [["title"]]]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.RENAME_ARTIFACT,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -788,7 +789,7 @@ class ArtifactsAPI:
             Export result with document URL.
         """
         params = [None, artifact_id, None, title, int(export_type)]
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             RPCMethod.EXPORT_ARTIFACT,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -812,7 +813,7 @@ class ArtifactsAPI:
             Export result with spreadsheet URL.
         """
         params = [None, artifact_id, None, title, int(ExportType.SHEETS)]
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             RPCMethod.EXPORT_ARTIFACT,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -842,7 +843,7 @@ class ArtifactsAPI:
             Export result with document URL.
         """
         params = [None, artifact_id, content, title, int(export_type)]
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             RPCMethod.EXPORT_ARTIFACT,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -878,7 +879,7 @@ class ArtifactsAPI:
         """Get raw artifact list data."""
         # Keep this facade hop so callers/tests that patch ``api._list_raw``
         # still affect public listing paths that delegate into the service.
-        return await self._listing.list_raw(notebook_id, rpc_call=self._core.rpc_call)
+        return await self._listing.list_raw(notebook_id, rpc_call=self._session.rpc_call)
 
     def _select_artifact(
         self,

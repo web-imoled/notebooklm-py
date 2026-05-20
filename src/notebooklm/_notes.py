@@ -51,7 +51,8 @@ class NotesAPI:
                 mind-map and note-row operations. Keyword-only so the public
                 positional constructor contract stays unchanged.
         """
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
         self._mind_map_service = (
             _mind_map.MindMapService(session) if mind_map_service is None else mind_map_service
         )
@@ -172,7 +173,7 @@ class NotesAPI:
             else f"Chat: {ask_result.answer[:50].strip().replace(chr(10), ' ')}"
         )
         return await _mind_map.save_chat_answer_as_note(
-            self._core,
+            self._session,
             notebook_id,
             ask_result.answer,
             ask_result.references,

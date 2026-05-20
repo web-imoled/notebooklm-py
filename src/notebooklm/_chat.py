@@ -131,7 +131,8 @@ class ChatAPI:
         elif core is not None:
             raise TypeError("ChatAPI received both 'session' and 'core'")
 
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
         if notebooks is None:
             from ._notebooks import NotebooksAPI
 
@@ -234,7 +235,7 @@ class ChatAPI:
         # guard at ``_authed_transport.py:258-262`` only catches misuse on
         # the POST itself, which is *after* the conversation lock is
         # already held — too late.
-        self._core.assert_bound_loop()
+        self._session.assert_bound_loop()
         logger.debug(
             "Asking question in notebook %s (conversation=%s)",
             notebook_id,
@@ -278,10 +279,10 @@ class ChatAPI:
 
             # Mint the request-id under the asyncio-safe counter helper so two
             # concurrent ``ask`` calls on the same client never collide. The
-            # previous direct mutation ``self._core._reqid_counter += 100000``
+            # previous direct mutation ``self._session._reqid_counter += 100000``
             # raced under ``asyncio.gather`` and produced duplicate ``_reqid``
             # URL params.
-            reqid = await self._core.next_reqid()
+            reqid = await self._session.next_reqid()
 
             def build_request(snapshot: _AuthSnapshot) -> tuple[str, str, dict[str, str]]:
                 return self._build_chat_request(
@@ -303,7 +304,7 @@ class ChatAPI:
             reqid_token = None if get_request_id() is not None else set_request_id()
             try:
                 response = await chat_aware_authed_post(
-                    self._core,
+                    self._session,
                     build_request=build_request,
                     parse_label="chat.ask",
                 )
@@ -418,7 +419,7 @@ class ChatAPI:
             limit,
         )
         params: list[Any] = [[], None, None, conversation_id, limit]
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             RPCMethod.GET_CONVERSATION_TURNS,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -437,7 +438,7 @@ class ChatAPI:
         """
         logger.debug("Getting conversation ID for notebook %s", notebook_id)
         params: list[Any] = [[], None, notebook_id, 1]
-        raw = await self._core.rpc_call(
+        raw = await self._session.rpc_call(
             RPCMethod.GET_LAST_CONVERSATION_ID,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -593,7 +594,7 @@ class ChatAPI:
             # Param shape captured from web-UI traffic. The trailing 1 is
             # always observed; its meaning is uncharted — treated as a fixed flag.
             params: list[Any] = [[], conversation_id, None, 1]
-            await self._core.rpc_call(
+            await self._session.rpc_call(
                 RPCMethod.DELETE_CONVERSATION,
                 params,
                 source_path=f"/notebook/{notebook_id}",
@@ -650,7 +651,7 @@ class ChatAPI:
             [[None, None, None, None, None, None, None, chat_settings]],
         ]
 
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.RENAME_NOTEBOOK,
             params,
             source_path=f"/notebook/{notebook_id}",

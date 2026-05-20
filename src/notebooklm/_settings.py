@@ -147,7 +147,8 @@ class SettingsAPI:
         Args:
             session: The shared client session.
         """
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
 
     async def set_output_language(self, language: str) -> str | None:
         """Set the output language for artifact generation.
@@ -176,7 +177,7 @@ class SettingsAPI:
         # Params structure: [[[null,[[null,null,null,null,["language_code"]]]]]]
         params = [[[None, [[None, None, None, None, [language]]]]]]
 
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.SET_USER_SETTINGS,
             params,
             source_path="/",
@@ -197,7 +198,7 @@ class SettingsAPI:
         """
         logger.debug("Fetching user settings to get output language")
 
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.GET_USER_SETTINGS,
             build_get_user_settings_params(),
             source_path="/",
@@ -215,7 +216,7 @@ class SettingsAPI:
         """
         logger.debug("Fetching user settings to get account limits")
 
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.GET_USER_SETTINGS,
             build_get_user_settings_params(),
             source_path="/",
@@ -236,7 +237,7 @@ class SettingsAPI:
         """
         logger.debug("Fetching user tier")
 
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.GET_USER_TIER,
             build_get_user_tier_params(),
             source_path="/",

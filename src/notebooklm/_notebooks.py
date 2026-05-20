@@ -157,7 +157,8 @@ class NotebooksAPI:
             metadata_service: Optional explicit metadata service for tests or advanced wiring.
             share_manager: Optional explicit legacy share manager for tests or advanced wiring.
         """
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
         self._sources = sources_api or create_default_source_lister(self._rpc_call)
         self._metadata_service = metadata_service or NotebookMetadataService(
             # Keep notebook lookup late-bound so tests and advanced callers that
@@ -178,7 +179,7 @@ class NotebooksAPI:
         disable_internal_retries: bool = False,
     ) -> Any:
         """Delegate through the current core RPC method for late-bound overrides."""
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             method,
             params,
             source_path=source_path,
@@ -267,7 +268,7 @@ class NotebooksAPI:
         """
         logger.debug("Listing notebooks")
         params = [None, 1, None, [2]]
-        result = await self._core.rpc_call(RPCMethod.LIST_NOTEBOOKS, params)
+        result = await self._session.rpc_call(RPCMethod.LIST_NOTEBOOKS, params)
 
         if result and isinstance(result, list) and len(result) > 0:
             raw_notebooks = result[0] if isinstance(result[0], list) else result
@@ -325,7 +326,7 @@ class NotebooksAPI:
 
         async def _create() -> Notebook:
             try:
-                result = await self._core.rpc_call(
+                result = await self._session.rpc_call(
                     RPCMethod.CREATE_NOTEBOOK,
                     params,
                     disable_internal_retries=True,
@@ -442,7 +443,7 @@ class NotebooksAPI:
 
     async def _get_account_limits(self) -> AccountLimits:
         """Fetch NotebookLM account limits from user settings."""
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.GET_USER_SETTINGS,
             build_get_user_settings_params(),
             source_path="/",
@@ -465,7 +466,7 @@ class NotebooksAPI:
                 this method post-validates the parsed response.
         """
         params = [notebook_id, None, [2], None, 0]
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.GET_NOTEBOOK,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -504,7 +505,7 @@ class NotebooksAPI:
         """
         logger.debug("Deleting notebook: %s", notebook_id)
         params = [[notebook_id], [2]]
-        await self._core.rpc_call(RPCMethod.DELETE_NOTEBOOK, params)
+        await self._session.rpc_call(RPCMethod.DELETE_NOTEBOOK, params)
         return True
 
     async def rename(self, notebook_id: str, new_title: str) -> Notebook:
@@ -521,7 +522,7 @@ class NotebooksAPI:
         # Payload format discovered via browser traffic capture:
         # [notebook_id, [[null, null, null, [null, new_title]]]]
         params = [notebook_id, [[None, None, None, [None, new_title]]]]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.RENAME_NOTEBOOK,
             params,
             source_path="/",  # Home page context, not notebook page
@@ -542,7 +543,7 @@ class NotebooksAPI:
             Raw summary text string.
         """
         params = [notebook_id, [2]]
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.SUMMARIZE,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -578,7 +579,7 @@ class NotebooksAPI:
         """
         # Get raw summary data
         params = [notebook_id, [2]]
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.SUMMARIZE,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -606,7 +607,7 @@ class NotebooksAPI:
             notebook_id: The notebook ID to remove from recent.
         """
         params = [notebook_id]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.REMOVE_RECENTLY_VIEWED,
             params,
             allow_null=True,
@@ -625,7 +626,7 @@ class NotebooksAPI:
             Raw API response data.
         """
         params = [notebook_id, None, [2], None, 0]
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             RPCMethod.GET_NOTEBOOK,
             params,
             source_path=f"/notebook/{notebook_id}",

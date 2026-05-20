@@ -207,7 +207,8 @@ class ResearchAPI:
         Args:
             session: The shared client session.
         """
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
 
     @staticmethod
     def _parse_result_type(value: Any) -> int | str:
@@ -320,7 +321,7 @@ class ResearchAPI:
             params = [None, [1], [query, source_type], 5, notebook_id]
             rpc_id = RPCMethod.START_DEEP_RESEARCH
 
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             rpc_id,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -389,7 +390,7 @@ class ResearchAPI:
         """
         logger.debug("Polling research status for notebook %s", notebook_id)
         params = [None, None, notebook_id]
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.POLL_RESEARCH,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -615,7 +616,7 @@ class ResearchAPI:
 
         params = [None, [1], effective_task_id, notebook_id, source_array]
 
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.IMPORT_RESEARCH,
             params,
             source_path=f"/notebook/{notebook_id}",

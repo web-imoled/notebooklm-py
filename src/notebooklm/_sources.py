@@ -73,7 +73,8 @@ class SourcesAPI:
                 :meth:`add_file` uploads. The semaphore is owned by this
                 Sources upload pipeline, not by the shared core/session.
         """
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
         self._adder = SourceAddService()
         self._content = SourceContentRenderer(self._rpc_call, logger=logger)
         self._lister = SourceLister(self._rpc_call)
@@ -100,7 +101,7 @@ class SourcesAPI:
         operation_variant: str | None = None,
     ) -> Any:
         """Delegate through the current core RPC method for late-bound test overrides."""
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             method,
             params,
             source_path=source_path,
@@ -545,7 +546,7 @@ class SourcesAPI:
         """
         logger.debug("Deleting source %s from notebook %s", source_id, notebook_id)
         params = [[[source_id]]]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.DELETE_SOURCE,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -566,7 +567,7 @@ class SourcesAPI:
         """
         logger.debug("Renaming source %s to: %s", source_id, new_title)
         params = [None, [source_id], [[[new_title]]]]
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.UPDATE_SOURCE,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -585,7 +586,7 @@ class SourcesAPI:
             True if refresh was initiated.
         """
         params = [None, [source_id], [2]]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.REFRESH_SOURCE,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -604,7 +605,7 @@ class SourcesAPI:
             True if source is fresh, False if it needs refresh.
         """
         params = [None, [source_id], [2]]
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.CHECK_SOURCE_FRESHNESS,
             params,
             source_path=f"/notebook/{notebook_id}",

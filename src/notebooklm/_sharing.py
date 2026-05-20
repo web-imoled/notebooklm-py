@@ -40,7 +40,8 @@ class SharingAPI:
         Args:
             session: The shared client session.
         """
-        self._core = session
+        self._session = session
+        self._core = self._session  # back-compat alias (tests, external callers)
 
     async def get_status(self, notebook_id: str) -> ShareStatus:
         """Get current sharing configuration.
@@ -53,7 +54,7 @@ class SharingAPI:
         """
         logger.debug("Getting share status for notebook: %s", notebook_id)
         params = [notebook_id, [2]]
-        result = await self._core.rpc_call(
+        result = await self._session.rpc_call(
             RPCMethod.GET_SHARE_STATUS,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -87,7 +88,7 @@ class SharingAPI:
             None,
             [2],
         ]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.SHARE_NOTEBOOK,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -119,7 +120,7 @@ class SharingAPI:
             notebook_id,
             [[None, None, None, None, None, None, None, None, [[level.value]]]],
         ]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.RENAME_NOTEBOOK,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -188,7 +189,7 @@ class SharingAPI:
             None,
             [2],
         ]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.SHARE_NOTEBOOK,
             params,
             source_path=f"/notebook/{notebook_id}",
@@ -242,7 +243,7 @@ class SharingAPI:
             None,
             [2],
         ]
-        await self._core.rpc_call(
+        await self._session.rpc_call(
             RPCMethod.SHARE_NOTEBOOK,
             params,
             source_path=f"/notebook/{notebook_id}",

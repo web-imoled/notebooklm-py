@@ -269,41 +269,41 @@ class NotebookLMClient:
         self._core = self._session
 
         source_uploader = SourceUploadPipeline(
-            self._core,
-            self._core.kernel,
-            self._core.auth,
+            self._session,
+            self._session.kernel,
+            self._session.auth,
             upload_timeout=upload_timeout,
             max_concurrent_uploads=max_concurrent_uploads,
-            record_upload_queue_wait=self._core.record_upload_queue_wait,
+            record_upload_queue_wait=self._session.record_upload_queue_wait,
         )
         self.sources = SourcesAPI(
-            self._core,
+            self._session,
             uploader=source_uploader,
             upload_timeout=upload_timeout,
             max_concurrent_uploads=max_concurrent_uploads,
         )
-        self.notebooks = NotebooksAPI(self._core, sources_api=self.sources)
+        self.notebooks = NotebooksAPI(self._session, sources_api=self.sources)
         self.artifacts = ArtifactsAPI(
-            self._core,
+            self._session,
             storage_path=storage_path,
             notebooks=self.notebooks,
-            drain_hooks=self._core,
+            drain_hooks=self._session,
         )
-        self.notes = NotesAPI(self._core)
-        self.chat = ChatAPI(self._core, notebooks=self.notebooks)
-        self.research = ResearchAPI(self._core)
-        self.settings = SettingsAPI(self._core)
-        self.sharing = SharingAPI(self._core)
+        self.notes = NotesAPI(self._session)
+        self.chat = ChatAPI(self._session, notebooks=self.notebooks)
+        self.research = ResearchAPI(self._session)
+        self.settings = SettingsAPI(self._session)
+        self.sharing = SharingAPI(self._session)
 
     @property
     def auth(self) -> AuthTokens:
         """Get the authentication tokens."""
-        return self._core.auth
+        return self._session.auth
 
     async def __aenter__(self) -> NotebookLMClient:
         """Open the client connection."""
         logger.debug("Opening NotebookLM client")
-        await self._core.open()
+        await self._session.open()
         return self
 
     async def __aexit__(
@@ -335,7 +335,7 @@ class NotebookLMClient:
 
     async def drain(self, timeout: float | None = None) -> None:
         """Stop accepting new operations and wait for in-flight operations to finish."""
-        await self._core.drain(timeout=timeout)
+        await self._session.drain(timeout=timeout)
 
     async def close(
         self,
@@ -363,7 +363,7 @@ class NotebookLMClient:
                 await self.drain(timeout=drain_timeout)
             except TimeoutError as drain_exc:
                 try:
-                    await self._core.close()
+                    await self._session.close()
                 except Exception as close_exc:
                     logger.warning(
                         "Suppressing close() error after drain timeout to preserve timeout "
@@ -373,13 +373,13 @@ class NotebookLMClient:
                     raise drain_exc from close_exc
                 raise
             else:
-                await self._core.close()
+                await self._session.close()
                 return
-        await self._core.close()
+        await self._session.close()
 
     def metrics_snapshot(self) -> ClientMetricsSnapshot:
         """Return cumulative observability counters for this client."""
-        return self._core.metrics_snapshot()
+        return self._session.metrics_snapshot()
 
     async def rpc_call(
         self,
@@ -406,7 +406,7 @@ class NotebookLMClient:
         policy in the mutating-RPC idempotency registry. Most callers should
         leave it ``None`` (the default) — Wave 2 will add variant entries.
         """
-        return await self._core.rpc_call(
+        return await self._session.rpc_call(
             method=method,
             params=params,
             source_path=source_path,
@@ -419,7 +419,7 @@ class NotebookLMClient:
     @property
     def is_connected(self) -> bool:
         """Check if the client is connected."""
-        return self._core.is_open
+        return self._session.is_open
 
     @classmethod
     async def from_storage(
@@ -534,4 +534,4 @@ class NotebookLMClient:
         Raises:
             ValueError: If token extraction fails (page structure may have changed).
         """
-        return await refresh_auth_session(self._core)
+        return await refresh_auth_session(self._session)
