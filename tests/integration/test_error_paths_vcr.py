@@ -185,7 +185,7 @@ class TestErrorPaths:
 
         Replays ``error_synthetic_stale_csrf.yaml``: the first batchexecute
         POST returns HTTP 400 (NotebookLM's documented stale-CSRF response —
-        see :func:`notebooklm._core.is_auth_error`); the client's auth-refresh
+        see :func:`notebooklm._session.is_auth_error`); the client's auth-refresh
         branch fires once via the stub callback installed below; the second
         cassette interaction returns the same synthetic 400, which surfaces
         as :class:`ClientError` via the standard 4xx mapping in

@@ -205,7 +205,7 @@ async def test_refresh_auth_session_persists_through_client_core_save_cookies(
         calls.append((path, return_result, original_snapshot))
         return True
 
-    monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", fake_save_cookies_to_storage)
+    monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", fake_save_cookies_to_storage)
 
     http_client = httpx.AsyncClient(
         transport=httpx.MockTransport(handler),
@@ -282,12 +282,12 @@ def test_auth_session_has_no_runtime_client_or_core_imports() -> None:
             continue
         if isinstance(node, ast.Import):
             for alias in node.names:
-                if alias.name in {"notebooklm.client", "notebooklm._core"}:
+                if alias.name in {"notebooklm.client", "notebooklm._session"}:
                     violations.append((node.lineno, f"import {alias.name}"))
         elif isinstance(node, ast.ImportFrom):
             module = node.module or ""
             imported_names = {alias.name for alias in node.names}
-            if module in {"notebooklm.client", "notebooklm._core", "client", "_core"}:
+            if module in {"notebooklm.client", "notebooklm._session", "client", "_core"}:
                 violations.append((node.lineno, f"from {module} import ..."))
             if (module == "notebooklm" or (node.level > 0 and module == "")) and imported_names & {
                 "client",

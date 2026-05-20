@@ -265,7 +265,7 @@ async def test_emit_rpc_event_uses_maybe_await_callback_dispatch() -> None:
 async def test_emit_rpc_event_swallows_callback_exception(caplog) -> None:
     """A misbehaving user callback must not surface as an RPC failure.
 
-    Logged at WARNING under the ``notebooklm._core`` logger so existing
+    Logged at WARNING under the ``notebooklm._session`` logger so existing
     user-facing log filters on that namespace keep catching the diagnostic.
     """
 

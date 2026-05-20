@@ -264,16 +264,16 @@ class ClientLifecycle:
 
         Single chokepoint used by :meth:`close`, :meth:`_keepalive_loop`, and
         ``NotebookLMClient.refresh_auth``. The storage writer is resolved
-        from ``notebooklm._core`` at call time so the
-        ``monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", …)``
+        from ``notebooklm._session`` at call time so the
+        ``monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", …)``
         surface used by 8+ test files keeps affecting the live save path.
         """
-        from . import _core as _core_module
+        from . import _session as _session_module
 
         await host.cookie_persistence.save(
             jar,
             path,
-            save_cookies_to_storage=_core_module.save_cookies_to_storage,
+            save_cookies_to_storage=_session_module.save_cookies_to_storage,
             to_thread=asyncio.to_thread,
         )
 
@@ -382,13 +382,13 @@ class ClientLifecycle:
         :class:`asyncio.CancelledError` from :meth:`close`.
         """
         logger.debug("Keepalive task started (interval=%.1fs)", interval)
-        # Resolved from ``notebooklm._core`` once, before the loop, so the
-        # existing ``monkeypatch.setattr("notebooklm._core._rotate_cookies",
+        # Resolved from ``notebooklm._session`` once, before the loop, so the
+        # existing ``monkeypatch.setattr("notebooklm._session._rotate_cookies",
         # …)`` surface in ``test_close_cancellation_leak.py`` keeps affecting
-        # the live keepalive loop after the extraction. The attribute lookup
-        # on ``_core_module._rotate_cookies`` still happens at call time, so
+        # the live keepalive loop. The attribute lookup on
+        # ``_session_module._rotate_cookies`` still happens at call time, so
         # late monkeypatches remain effective without re-importing every tick.
-        from . import _core as _core_module
+        from . import _session as _session_module
 
         try:
             while True:
@@ -406,7 +406,7 @@ class ClientLifecycle:
                     # concurrent layer-1 callers (e.g. spawned ``fetch_tokens``
                     # tasks on the same profile) and other keepalive loops on
                     # the same profile see the fresh rotation and skip.
-                    await _core_module._rotate_cookies(client, self._keepalive_storage_path)
+                    await _session_module._rotate_cookies(client, self._keepalive_storage_path)
                 except asyncio.CancelledError:
                     raise
                 except Exception as exc:  # noqa: BLE001 - opportunistic best-effort

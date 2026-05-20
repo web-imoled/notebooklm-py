@@ -1149,7 +1149,7 @@ class TestBaselineNotAdvancedOnSaveFailure:
         def silent_fail(jar, path, **kwargs):
             return False
 
-        monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", silent_fail)
+        monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", silent_fail)
 
         async with client:
             baseline_before = client._core._loaded_cookie_snapshot
@@ -1660,7 +1660,7 @@ class TestSaveCookiesSeesLatestBaselineUnderContention:
             )
             return real_save(jar, path, original_snapshot=original_snapshot, **kwargs)
 
-        monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", capture_save)
+        monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", capture_save)
 
         # Explicit barrier: each coroutine records its submission and the
         # second arrival sets ``both_submitted``; both then ``await`` the
@@ -1683,7 +1683,7 @@ class TestSaveCookiesSeesLatestBaselineUnderContention:
             await both_submitted.wait()
             return func(*args, **kwargs)
 
-        monkeypatch.setattr("notebooklm._core.asyncio.to_thread", fake_to_thread)
+        monkeypatch.setattr("notebooklm._session.asyncio.to_thread", fake_to_thread)
 
         # Two jars representing distinct post-rotation states. The save that
         # acquires ``_save_lock`` first rotates *PSIDTS away from v0; the

@@ -311,7 +311,7 @@ def test_child_emission_scrubbed_via_parent_handler_mutation(saved_logger_state)
     handler = saved_logger_state.handlers[0]
     handler.stream = buf
 
-    logging.getLogger("notebooklm._core").warning(
+    logging.getLogger("notebooklm._session").warning(
         "child record: at=ALSO_SECRET", exc_info=raising_exc_info("at=SECRET_TOK detail")
     )
 
@@ -332,7 +332,7 @@ def test_records_propagate_to_root_with_scrubbed_msg(saved_logger_state, saved_r
 
     configure_logging()
 
-    logging.getLogger("notebooklm._core").warning("propagated: at=SECRET_TOK should be scrubbed")
+    logging.getLogger("notebooklm._session").warning("propagated: at=SECRET_TOK should be scrubbed")
 
     root_out = root_buf.getvalue()
     # Record reached root via propagation (proves propagate=True still works).
@@ -366,7 +366,7 @@ def test_preexisting_handler_gets_redaction_with_braces_style_preserved(
     assert getattr(h, "_notebooklm_redacting", False) is True
 
     # Scrubbing still works via the pre-existing handler.
-    logging.getLogger("notebooklm._core").warning("preexisting at=SECRET_TOK record")
+    logging.getLogger("notebooklm._session").warning("preexisting at=SECRET_TOK record")
     out = buf.getvalue()
     assert "SECRET_TOK" not in out
     assert "at=***" in out
@@ -388,7 +388,7 @@ def test_preexisting_custom_formatter_subclass_preserved(saved_logger_state):
     configure_logging()
 
     # Apply_redaction wraps but inner TaggingFormatter is still called.
-    logging.getLogger("notebooklm._core").warning("hello at=SECRET")
+    logging.getLogger("notebooklm._session").warning("hello at=SECRET")
     out = buf.getvalue()
     assert out.startswith("[TAG] ")
     assert "SECRET" not in out

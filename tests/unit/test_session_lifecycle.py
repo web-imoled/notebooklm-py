@@ -19,7 +19,7 @@ Specifically pinned here:
 * :meth:`ClientLifecycle.save_cookies` **invokes** the host's
   ``cookie_persistence.save`` collaborator with the right ``jar`` and
   ``path`` arguments AND with the ``save_cookies_to_storage`` value resolved
-  from ``notebooklm._core`` at call time (so the monkeypatch surface keeps
+  from ``notebooklm._session`` at call time (so the monkeypatch surface keeps
   working).
 * The httpx ``AsyncClient`` **always uses httpx's default transport** —
   Tier-12 PR 12.6 lifted synthetic-error injection into the chain
@@ -46,7 +46,7 @@ from unittest.mock import AsyncMock, MagicMock
 import httpx
 import pytest
 
-from notebooklm import _core as _core_module
+from notebooklm import _session as _core_module
 from notebooklm._session import _resolve_keepalive_interval
 from notebooklm._session_lifecycle import ClientLifecycle
 from notebooklm.auth import AuthTokens
@@ -368,8 +368,8 @@ async def test_save_cookies_invokes_cookie_persistence(
 ) -> None:
     """``save_cookies(host, jar, path)`` delegates to
     ``host.cookie_persistence.save(...)`` with ``save_cookies_to_storage``
-    resolved from ``notebooklm._core`` at call time (so the
-    ``monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", …)``
+    resolved from ``notebooklm._session`` at call time (so the
+    ``monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", …)``
     surface in 8+ test files keeps working).
     """
     # Stub out save_cookies_to_storage at the module level so we can prove
@@ -390,7 +390,7 @@ async def test_save_cookies_invokes_cookie_persistence(
     assert call.args[0] is jar
     assert call.args[1] == target_path
     # ``save_cookies_to_storage`` must be the monkeypatched sentinel — the
-    # lifecycle MUST resolve it from notebooklm._core at call time.
+    # lifecycle MUST resolve it from notebooklm._session at call time.
     assert call.kwargs["save_cookies_to_storage"] is sentinel
     assert call.kwargs["to_thread"] is asyncio.to_thread
 

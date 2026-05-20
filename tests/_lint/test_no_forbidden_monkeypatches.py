@@ -20,7 +20,7 @@ Forbidden patterns
 
    .. code-block:: python
 
-       monkeypatch.setattr(notebooklm._core, "asyncio", fake_asyncio)
+       monkeypatch.setattr(notebooklm._session, "asyncio", fake_asyncio)
 
 3. **Direct attribute assignment of ``AsyncMock`` to the core's RPC/
    transport surface** — mutates an instance instead of injecting at

@@ -11,7 +11,7 @@ import httpx
 import pytest
 
 import notebooklm._cookie_persistence as persistence_module
-import notebooklm._core as core_module
+import notebooklm._session as core_module
 from notebooklm._cookie_persistence import CookiePersistence
 from notebooklm._session import Session
 from notebooklm.auth import (
@@ -215,11 +215,11 @@ def test_cookie_persistence_does_not_import_client_core_at_runtime() -> None:
 
     forbidden_imports: list[str] = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module in {"_core", "notebooklm._core"}:
+        if isinstance(node, ast.ImportFrom) and node.module in {"_core", "notebooklm._session"}:
             forbidden_imports.extend(alias.name for alias in node.names)
         elif isinstance(node, ast.Import):
             forbidden_imports.extend(
-                alias.name for alias in node.names if alias.name == "notebooklm._core"
+                alias.name for alias in node.names if alias.name == "notebooklm._session"
             )
 
     assert forbidden_imports == []

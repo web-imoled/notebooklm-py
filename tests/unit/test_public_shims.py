@@ -1161,8 +1161,8 @@ def test_public_shim_all_contract(shim_name: str, internal_name: str) -> None:
 #
 # When ``_core.py``'s preamble was split into ``_session_config.py``,
 # ``_error_injection.py``, and ``_session_helpers.py``, the legacy import
-# surface (``from notebooklm._core import …``) was preserved via re-export
-# aliases. These tests pin that the re-exported name on ``notebooklm._core``
+# surface (``from notebooklm._session import …``) was preserved via re-export
+# aliases. These tests pin that the re-exported name on ``notebooklm._session``
 # is the **same object** as the canonical name on the seam module — so if a
 # future refactor accidentally rebinds the alias or shadows the symbol, the
 # drift surfaces here instead of at the next ``monkeypatch.setattr`` call
@@ -1171,7 +1171,7 @@ def test_public_shim_all_contract(shim_name: str, internal_name: str) -> None:
 
 
 def test_is_auth_error_resolves_through_module():
-    import notebooklm._core as _core
+    import notebooklm._session as _core
     from notebooklm import _session_helpers
 
     assert _core.is_auth_error is _session_helpers.is_auth_error
@@ -1181,9 +1181,9 @@ def test_error_injection_symbols_resolve_through_core():
     """Pin re-export identity for the highest-risk monkeypatch surfaces.
 
     ``test_session_lifecycle.py`` monkeypatches ``_get_error_injection_mode``
-    through ``notebooklm._core``, and ``tests/conftest.py`` /
+    through ``notebooklm._session``, and ``tests/conftest.py`` /
     ``tests/unit/test_vcr_config.py`` import ``ERROR_INJECT_ENV_VAR`` from
-    ``notebooklm._core``. A future refactor that accidentally shadows the
+    ``notebooklm._session``. A future refactor that accidentally shadows the
     re-export (e.g. by reassigning the alias at module scope) would silently
     break those monkeypatches before any behavior test catches it — these
     identity pins surface that drift here.
@@ -1193,7 +1193,7 @@ def test_error_injection_symbols_resolve_through_core():
     substitution lives in ``_middleware_error_injection.ErrorInjectionMiddleware``
     now, so that identity pin is gone.
     """
-    import notebooklm._core as _core
+    import notebooklm._session as _core
     from notebooklm import _error_injection
 
     assert _core.ERROR_INJECT_ENV_VAR is _error_injection.ERROR_INJECT_ENV_VAR

@@ -99,9 +99,9 @@ VALID_ERROR_MODES = _cassette_patterns.VALID_ERROR_MODES
 
 # env var name shared with ``src/notebooklm/_core.py``. Kept in sync
 # as a local copy so the VCR-only replay path (which does not import
-# ``notebooklm._core``) can still parse the env var without dragging the
+# ``notebooklm._session``) can still parse the env var without dragging the
 # production module in. The unit tests in ``tests/unit/test_vcr_config.py``
-# import ``ERROR_INJECT_ENV_VAR`` directly from ``notebooklm._core`` — the
+# import ``ERROR_INJECT_ENV_VAR`` directly from ``notebooklm._session`` — the
 # duplication here covers ONLY the VCR-replay path, not the unit-test path.
 ERROR_INJECT_ENV_VAR = "NOTEBOOKLM_VCR_RECORD_ERRORS"
 

@@ -449,7 +449,7 @@ def test_chat_protocol_static_import_guard() -> None:
         "notebooklm",
         "notebooklm.client",
         "notebooklm._chat",
-        "notebooklm._core",
+        "notebooklm._session",
         "notebooklm.rpc.overrides",
     }
     tree = ast.parse((SRC_ROOT / "_chat_protocol.py").read_text(encoding="utf-8"))
@@ -476,7 +476,7 @@ def test_chat_protocol_runtime_import_does_not_request_forbidden_modules(monkeyp
     forbidden = {
         "notebooklm.client",
         "notebooklm._chat",
-        "notebooklm._core",
+        "notebooklm._session",
         "notebooklm.rpc.overrides",
     }
     sys.modules.pop("notebooklm._chat_protocol", None)

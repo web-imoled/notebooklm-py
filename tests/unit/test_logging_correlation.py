@@ -195,13 +195,13 @@ async def test_id_does_not_leak_after_reset():
 
 @pytest.mark.asyncio
 async def test_correlation_threads_through_child_loggers():
-    """Emissions from notebooklm._core and notebooklm._chat get same prefix
+    """Emissions from notebooklm._session and notebooklm._chat get same prefix
     within a single task."""
     filt = RedactingFilter()
     token = set_request_id("CHILD001")
     try:
         rec_core = logging.LogRecord(
-            name="notebooklm._core",
+            name="notebooklm._session",
             level=logging.WARNING,
             pathname=__file__,
             lineno=0,

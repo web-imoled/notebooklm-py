@@ -78,7 +78,7 @@ async def test_rpc_metrics_event_and_correlation_scope(auth_tokens: AuthTokens) 
         return {"ok": True}
 
     with (
-        patch("notebooklm._core.decode_response", fake_decode),
+        patch("notebooklm._session.decode_response", fake_decode),
         correlation_id("batch-42"),
     ):
         result = await core.rpc_call(RPCMethod.GET_NOTEBOOK, ["nb_123"])

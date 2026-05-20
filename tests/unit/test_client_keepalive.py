@@ -266,7 +266,7 @@ class TestKeepalivePersistenceFailure:
             save_calls.append(path)
             raise OSError("simulated disk full")
 
-        monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", boom)
+        monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", boom)
 
         client = NotebookLMClient(
             auth,
@@ -401,7 +401,7 @@ class TestKeepaliveExplicitStoragePath:
         def spy(cookies, path, **kwargs):
             save_calls.append((cookies, path))
 
-        monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", spy)
+        monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", spy)
 
         client = NotebookLMClient(auth, storage_path=storage_path)
         async with client:
@@ -490,7 +490,7 @@ class TestSaveCookiesUnification:
             call_kwargs.append(kwargs)
             return True
 
-        monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", spy)
+        monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", spy)
 
         await core.save_cookies(httpx.Cookies())
 
@@ -562,7 +562,7 @@ class TestSaveCookiesUnification:
             snapshot_kwarg_present.append("original_snapshot" in kwargs)
             return True
 
-        monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", spy)
+        monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", spy)
 
         async with client:
             await client.refresh_auth()

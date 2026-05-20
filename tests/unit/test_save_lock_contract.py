@@ -77,7 +77,7 @@ async def test_save_lock_acquired_off_event_loop_thread(
         observed["holder_thread"] = threading.current_thread()
         return True
 
-    monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", spy)
+    monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", spy)
 
     await core.save_cookies(httpx.Cookies())
 
@@ -133,7 +133,7 @@ async def test_save_lock_does_not_block_event_loop(
         )
         return True
 
-    monkeypatch.setattr("notebooklm._core.save_cookies_to_storage", spy)
+    monkeypatch.setattr("notebooklm._session.save_cookies_to_storage", spy)
 
     async def heartbeat() -> None:
         # Wait for the worker to enter the spy by polling — using asyncio.sleep

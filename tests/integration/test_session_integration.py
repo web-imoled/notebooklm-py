@@ -49,7 +49,7 @@ class TestClientInitialization:
         core = Session(auth)
         await core.open()
 
-        with patch("notebooklm._core.save_cookies_to_storage") as mock_save:
+        with patch("notebooklm._session.save_cookies_to_storage") as mock_save:
             await core.close()
 
         mock_save.assert_not_called()
@@ -61,7 +61,7 @@ class TestClientInitialization:
         core = Session(auth_tokens)
         await core.open()
 
-        with patch("notebooklm._core.save_cookies_to_storage", side_effect=RuntimeError("boom")):
+        with patch("notebooklm._session.save_cookies_to_storage", side_effect=RuntimeError("boom")):
             await core.close()
 
         assert core._http_client is None
@@ -289,7 +289,7 @@ class TestRPCCallAuthRetry:
             mock_post = AsyncMock(return_value=success_response)
             install_post_as_stream(None, core._http_client, mock_post)
             with patch(
-                "notebooklm._core.decode_response",
+                "notebooklm._session.decode_response",
                 side_effect=[
                     RPCError("authentication expired"),
                     ["result_data"],

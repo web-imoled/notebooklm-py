@@ -95,11 +95,11 @@ def test_polling_registry_does_not_import_client_core_at_runtime() -> None:
 
     forbidden_imports: list[str] = []
     for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom) and node.module in {"_core", "notebooklm._core"}:
+        if isinstance(node, ast.ImportFrom) and node.module in {"_core", "notebooklm._session"}:
             forbidden_imports.extend(alias.name for alias in node.names)
         elif isinstance(node, ast.Import):
             forbidden_imports.extend(
-                alias.name for alias in node.names if alias.name == "notebooklm._core"
+                alias.name for alias in node.names if alias.name == "notebooklm._session"
             )
 
     assert forbidden_imports == []

@@ -135,7 +135,7 @@ async def test_close_during_keepalive_cancel_does_not_leak_transport(
         rotate_entered.set()
         await hang_event.wait()
 
-    monkeypatch.setattr("notebooklm._core._rotate_cookies", _hanging_rotate)
+    monkeypatch.setattr("notebooklm._session._rotate_cookies", _hanging_rotate)
 
     # ``keepalive_min_interval`` clamps short intervals up to its floor
     # (default 60s). Pass ``keepalive_min_interval=0.01`` so a 0.05s
