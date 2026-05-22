@@ -171,10 +171,9 @@ async def test_auth_refresh_middleware_honors_injected_predicate() -> None:
     exactly once when the injected ``is_auth_error`` predicate returns
     ``True``, regardless of the actual HTTP status code.
 
-    Phase 2 PR 4 (``.sisyphus/plans/refactor-completion-plan.md``)
-    rewrote this test off the legacy ``_core.is_auth_error`` string-target
-    monkeypatch and instead constructs the middleware directly with an
-    injected predicate. The
+    Refactor-completion cleanup rewrote this test off the legacy
+    ``_core.is_auth_error`` string-target monkeypatch and instead constructs
+    the middleware directly with an injected predicate. The
     production chain seeds ``AuthRefreshMiddleware`` with
     ``is_auth_error=_live_is_auth_error`` (see
     ``notebooklm._session._get_authed_transport``); that wiring is

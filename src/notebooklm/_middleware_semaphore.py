@@ -35,8 +35,8 @@ binding would have to be reset on loop reuse and would have a 2-call
 recursive-acquire deadlock risk; the factory closure avoids both.
 
 See ``docs/adr/0009-middleware-chain.md`` §"Chain ordering" + "PR 12.9
-close-out notes" for the rationale and ``.sisyphus/plans/
-tier-12-13-greenfield-migration.md`` row 12.9 for the PR sequence.
+close-out notes" for the rationale and ``docs/refactor-history.md`` for
+the migration sequence.
 """
 
 from __future__ import annotations

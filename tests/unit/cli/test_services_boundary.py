@@ -10,8 +10,7 @@ PR #954 split that file into the ``cli/services/login/`` package and the
 ``console.print`` / Click cleanup was explicitly deferred at that point (per
 PR #954's source-plan overrides). Adding the ``login/`` package to this guard
 is the job of a follow-up PR; doing it here would gate a passing PR-C on
-unrelated ~1500-2000 lines of refactor work. See
-``.sisyphus/drafts/pr-c-migration-map.md`` for the scope decision.
+unrelated ~1500-2000 lines of refactor work.
 
 The guard is a single source of truth — to extend it to the ``login/``
 package, add the module paths to ``GUARDED_PATHS`` and the existing

@@ -62,8 +62,7 @@ re-fires the synthetic error" behavior bit-for-bit.
 
 See ``docs/adr/0009-middleware-chain.md`` for the chain contract,
 ``src/notebooklm/_error_injection.py`` for the env-var / startup-guard
-helpers, and ``.sisyphus/plans/tier-12-13-greenfield-migration.md`` row 12.6
-for the PR sequence.
+helpers, and ``docs/refactor-history.md`` for the migration sequence.
 """
 
 from __future__ import annotations

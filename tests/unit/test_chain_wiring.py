@@ -10,8 +10,7 @@ PR 12.2 of the Tier-12/13 greenfield migration wires
 :meth:`Session._perform_authed_post` AND ``RpcExecutor.execute`` (which
 calls ``self._owner._perform_authed_post`` at ``_rpc_executor.py:275``).
 
-These tests verify the wiring contract from
-``.sisyphus/plans/tier-12-13-greenfield-migration.md`` line 160 and ADR-009
+These tests verify the wiring contract from ADR-009
 §"RpcRequest.context keys":
 
 1. Both call paths (``Session._perform_authed_post`` directly and

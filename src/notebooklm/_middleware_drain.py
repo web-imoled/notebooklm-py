@@ -46,8 +46,7 @@ the codebase had before this PR. Same scope (``Exception``-aware via
 
 See ``docs/adr/0009-middleware-chain.md`` for the chain contract,
 ``src/notebooklm/_transport_drain.py`` for the underlying tracker, and
-``.sisyphus/plans/tier-12-13-greenfield-migration.md`` row 12.5 for the
-PR sequence.
+``docs/refactor-history.md`` for the migration sequence.
 """
 
 from __future__ import annotations

@@ -34,7 +34,7 @@ to ``self._get_authed_transport().perform_authed_post``.
 ``RetryMiddleware`` reads ``log_label`` / ``disable_internal_retries``
 from the same ``context`` dict. ``AuthRefreshMiddleware`` reads
 ``log_label``. See ADR-009 §"Per-request behavior" and
-``.sisyphus/plans/tier-12-13-greenfield-migration.md`` line 160.
+``docs/architecture.md`` §"Middleware Chain".
 
 The order is pinned at two levels:
 * facade-level by ``tests/unit/test_chain_wiring.py::test_chain_seeded_with_final_adr_009_ordering``

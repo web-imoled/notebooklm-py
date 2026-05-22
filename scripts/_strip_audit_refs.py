@@ -89,7 +89,7 @@ SENTENCE_PATTERNS: list[tuple[str, str]] = [
         "",
     ),
     (
-        r"\s*Audit-row IDs from `\.sisyphus/plans/cli-ux-audit\.md` \([^)]*\) are noted in parentheses on each entry\.",
+        r"\s*Audit-row IDs from `[^`]*cli-ux-audit\.md` \([^)]*\) are noted in parentheses on each entry\.",
         "",
     ),
 ]

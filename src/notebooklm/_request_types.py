@@ -23,8 +23,7 @@ Three names live here:
   to use the tuple shape until they migrate.
 
 See ``docs/adr/0009-middleware-chain.md`` for the full chain contract and
-``.sisyphus/plans/tier-12-13-greenfield-migration.md`` section 2 for the
-PR sequence.
+``docs/refactor-history.md`` for the migration sequence.
 """
 
 from __future__ import annotations

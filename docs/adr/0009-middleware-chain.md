@@ -487,11 +487,10 @@ The `AuthSnapshot` and `BuildRequestResult` named dataclasses landed in
 PR 12.1 and live in `_request_types.py`. They are unused by
 `AuthRefreshMiddleware` today but are the target shape for Tier 13.
 
-Tier-13 follow-up (tracked in
-`.sisyphus/plans/tier-12-13-greenfield-migration.md` row 13.2): rewrite
-`AuthRefreshMiddleware` against the pinned closure-callback signature
-once `Kernel.post` is the chain leaf. The signature pinned in
-§"AuthRefreshMiddleware constructor signature" above is the target.
+Tier-13 follow-up: rewrite `AuthRefreshMiddleware` against the pinned
+closure-callback signature once `Kernel.post` is the chain leaf. The
+signature pinned in §"AuthRefreshMiddleware constructor signature" above
+is the target.
 
 ADR-010 (the original target of this forward reference) was itself
 superseded by ADR-013 ("Composable Session Capabilities") in v0.5.0.

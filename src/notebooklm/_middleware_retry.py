@@ -58,8 +58,7 @@ auth-refresh into a chain middleware outside this one.
 See ``docs/adr/0009-middleware-chain.md`` for the chain contract,
 ``src/notebooklm/_authed_transport.py`` for the (slimmed) leaf and the
 exception types this middleware catches, and
-``.sisyphus/plans/tier-12-13-greenfield-migration.md`` row 12.7 for the
-PR sequence.
+``docs/refactor-history.md`` for the migration sequence.
 """
 
 from __future__ import annotations

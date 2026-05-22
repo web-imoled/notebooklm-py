@@ -265,6 +265,6 @@ back-pressure contract.
 - [`docs/development.md`](./development.md) — contributor on-ramp; this
   conventions doc is linked from its "Key Design Decisions" section.
 - The architecture audit (findings CC2, CC3, CC5) that motivated this
-  catalogue lives in the internal planning notes (`.sisyphus/plans/`, not
-  checked in). Future codebase audits with naming-convention findings should
-  extend this document rather than spawn parallel tiebreaker files.
+  catalogue was folded into this document. Future codebase audits with
+  naming-convention findings should extend this document rather than spawn
+  parallel tiebreaker files.

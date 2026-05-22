@@ -5,11 +5,10 @@ This file locks the observable CLI behavior of all 9 leaf download commands
 flashcards) BEFORE the P3.T2 extraction so the registry-driven rewrite can be
 proven byte-for-byte equivalent.
 
-The PR ordering discipline (.sisyphus/phases/cli-audit-fixes/phase-3.md →
-Characterization-Test Discipline) requires this file to be added in commit 1
-and pass green against the unmodified ``download_cmd.py``. After the
-extraction commit lands, every test in this file MUST still pass without
-modification.
+The characterization-test discipline requires this file to be added before
+the extraction and pass green against the unmodified ``download_cmd.py``.
+After the extraction commit lands, every test in this file MUST still pass
+without modification.
 
 Coverage matrix (parametrized across the 9 leaf commands):
 

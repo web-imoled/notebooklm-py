@@ -578,7 +578,7 @@ def test_init_is_event_loop_agnostic() -> None:
 
 
 # ---------------------------------------------------------------------------
-# Injectable seams (Phase 2 PR 3 of .sisyphus/plans/refactor-completion-plan.md)
+# Injectable seams introduced during the refactor-completion cleanup.
 #
 # Three load-bearing properties pinned here:
 #

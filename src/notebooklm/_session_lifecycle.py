@@ -96,7 +96,7 @@ if TYPE_CHECKING:
 
 
 # ---------------------------------------------------------------------------
-# Injectable seams (Phase 2 PR 3 of `.sisyphus/plans/refactor-completion-plan.md`)
+# Injectable seams introduced during the refactor-completion cleanup.
 # ---------------------------------------------------------------------------
 #
 # These two callable seams let host integrations swap the on-disk cookie

@@ -55,8 +55,7 @@ conflated — chain failures = transport failures, decode failures track
 separately if anyone wants to add them.
 
 See ``docs/adr/0009-middleware-chain.md`` for the chain contract and
-``.sisyphus/plans/tier-12-13-greenfield-migration.md`` row 12.4 for the
-PR sequence.
+``docs/refactor-history.md`` for the migration sequence.
 """
 
 from __future__ import annotations

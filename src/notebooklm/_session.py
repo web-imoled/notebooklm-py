@@ -98,12 +98,12 @@ logger = logging.getLogger(__name__)
 
 
 def _decode_response_late_bound(raw: str, rpc_id: str, *, allow_null: bool = False) -> Any:
-    # Phase 2 PR 5 (``.sisyphus/plans/refactor-completion-plan.md``):
-    # imports ``decode_response`` from the canonical :mod:`notebooklm.rpc`
-    # surface rather than the legacy ``notebooklm._core`` compatibility
-    # shim. Tests that patched ``notebooklm._core.decode_response`` are
-    # re-targeted to ``notebooklm.rpc.decode_response`` in the same
-    # commit so the live RPC decode path stays patchable end-to-end.
+    # Refactor-completion cleanup: import ``decode_response`` from the
+    # canonical :mod:`notebooklm.rpc` surface rather than the legacy
+    # ``notebooklm._core`` compatibility shim. Tests that patched
+    # ``notebooklm._core.decode_response`` were re-targeted to
+    # ``notebooklm.rpc.decode_response`` so the live RPC decode path stays
+    # patchable end-to-end.
     from .rpc import decode_response
 
     return decode_response(raw, rpc_id, allow_null=allow_null)

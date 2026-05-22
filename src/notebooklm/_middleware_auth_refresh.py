@@ -63,8 +63,7 @@ invocation.
 See ``docs/adr/0009-middleware-chain.md`` for the chain contract,
 ``src/notebooklm/_session_auth.py`` for :class:`AuthRefreshCoordinator`
 (coalesced refresh + auth-snapshot lock), and
-``.sisyphus/plans/tier-12-13-greenfield-migration.md`` row 12.8 for the
-PR sequence.
+``docs/refactor-history.md`` for the migration sequence.
 """
 
 from __future__ import annotations
