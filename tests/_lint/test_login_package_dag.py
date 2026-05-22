@@ -36,12 +36,16 @@ ALLOWED_EDGES: dict[str, set[str]] = {
     },
     "chromium_accounts": {"cookie_jar", "rookiepy_errors", "cookie_domains"},
     "firefox_accounts": {
+        # `rookiepy_errors` and `cookie_domains` ARE imported (active edges).
+        # Only `cookie_jar` is allowed-but-unused — scoping the comment to
+        # the one unused entry avoids the "does this apply to all three?"
+        # ambiguity.
+        "rookiepy_errors",
+        "cookie_domains",
         # allowed but currently unused — the firefox helpers hand raw cookies
         # back to the caller (browser_accounts) which then routes through
         # _enumerate_one_jar; this module does not import it directly.
         "cookie_jar",
-        "rookiepy_errors",
-        "cookie_domains",
     },
     "browser_accounts": {
         "chromium_accounts",
