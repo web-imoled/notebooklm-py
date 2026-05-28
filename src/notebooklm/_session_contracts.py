@@ -68,16 +68,16 @@ class Kernel(Protocol):
 class RpcCaller(Protocol):
     """Narrow RPC dispatch surface consumed by pure-RPC feature APIs.
 
-    Mirrors the legacy ``Session.rpc_call`` signature exactly so feature
-    retypes do not change call semantics. The transitional
+    Mirrors the canonical :meth:`RpcExecutor.rpc_call` signature exactly so
+    feature retypes do not change call semantics. The transitional
     ``_is_retry`` parameter and the keyword-only
     ``disable_internal_retries`` / ``operation_variant`` parameters are
     preserved as-is.
 
-    A concrete :class:`notebooklm._session.Session` structurally
-    satisfies this Protocol; features that only need to issue RPC
-    calls depend on this narrow surface so they are not coupled to
-    transport, loop affinity, or close-time-hook concerns.
+    A concrete :class:`notebooklm._rpc_executor.RpcExecutor` structurally
+    satisfies this Protocol; features that only need to issue RPC calls
+    depend on this narrow surface so they are not coupled to transport,
+    loop affinity, or close-time-hook concerns.
     """
 
     async def rpc_call(

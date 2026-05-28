@@ -177,12 +177,27 @@ def make_fake_core(**overrides: Any) -> FakeSession:
 
     defaults["register_drain_hook"] = MagicMock(side_effect=_register_drain_hook)
 
-    # Convenience: ``rpc_call=AsyncMock(...)`` overrides BOTH the direct
-    # ``rpc_call`` attribute AND the ``rpc_executor.rpc_call`` mirror with
-    # the same mock so test idioms using either path observe the same
-    # interactions.
+    # Keep ``rpc_call`` and ``rpc_executor.rpc_call`` in sync so tests
+    # using either access path observe the same interactions. The two
+    # kwargs are mutually exclusive — ``rpc_call=`` is a convenience that
+    # builds the ``rpc_executor`` :class:`SimpleNamespace`; passing
+    # ``rpc_executor=`` directly is the canonical form for tests that
+    # build a richer namespace (e.g. with ``operation_scope`` etc).
+    if "rpc_call" in overrides and "rpc_executor" in overrides:
+        raise TypeError(
+            "make_fake_core() got both 'rpc_call' and 'rpc_executor'; "
+            "pass one or the other (the 'rpc_call' kwarg is a "
+            "convenience that builds the 'rpc_executor' SimpleNamespace)."
+        )
     if "rpc_call" in overrides:
         overrides["rpc_executor"] = SimpleNamespace(rpc_call=overrides["rpc_call"])
+    elif "rpc_executor" in overrides:
+        # Mirror the override's ``rpc_call`` (if present) onto the direct
+        # attribute so ``fake.rpc_call`` and
+        # ``fake.rpc_executor.rpc_call`` cannot drift at construction.
+        executor_override = overrides["rpc_executor"]
+        if hasattr(executor_override, "rpc_call"):
+            overrides["rpc_call"] = executor_override.rpc_call
 
     # Validate overrides early so a typo like ``rpc_cal=`` fails loudly
     # rather than landing as an unread attribute.

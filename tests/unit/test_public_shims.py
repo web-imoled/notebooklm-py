@@ -1127,6 +1127,42 @@ async def test_client_rpc_call_forwards_default_arguments() -> None:
     )
 
 
+@pytest.mark.asyncio
+async def test_client_rpc_executor_is_shared_with_session() -> None:
+    """``client._rpc_executor`` is the same instance bound onto the Session.
+
+    The :class:`NotebookLMClient` captures ``composed.executor`` during
+    ``__init__`` and stores it as ``self._rpc_executor``. The same
+    ``RpcExecutor`` is bound as ``Session._rpc_executor`` via the
+    write-once binder driven by :func:`compose_session_internals`. The
+    invariant matters because a test that swaps the executor's
+    ``rpc_call`` on either side observes the swap on every feature
+    consumer (and on :meth:`NotebookLMClient.rpc_call`).
+    """
+    from notebooklm import NotebookLMClient
+    from notebooklm.auth import AuthTokens
+
+    client = NotebookLMClient(
+        AuthTokens(
+            cookies={"SID": "test"},
+            csrf_token="csrf",
+            session_id="session",
+        )
+    )
+    assert client._rpc_executor is client._session._rpc_executor
+
+    # A swap on ``client._rpc_executor.rpc_call`` is observable through
+    # the public ``client.rpc_call`` wrapper — confirming the wrapper
+    # does not capture a stale reference at construction time.
+    from notebooklm.rpc import RPCMethod
+
+    swap = AsyncMock(return_value="swapped")
+    client._rpc_executor.rpc_call = swap
+    result = await client.rpc_call(RPCMethod.LIST_NOTEBOOKS, [])
+    assert result == "swapped"
+    swap.assert_awaited_once()
+
+
 # ---------------------------------------------------------------------------
 # __all__ contract tests for the public shim modules.
 #
